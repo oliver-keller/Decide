@@ -1,0 +1,3 @@
+paper_metrics.csv was calculated by Pickering et al. for 
+	Bryn Pickering, Francesco Lombardi, and Stefan Pfenninger. Diversity of options to eliminate fossil fuels and reach carbon neutrality across the 	entire european energy system. Joule, 6(6):1253–1276, 2022. doi:10.1016/j.joule.2022.05.009.
+data received from https://zenodo.org/record/6546817 under slack-10/data/papaer_metrics.csv
