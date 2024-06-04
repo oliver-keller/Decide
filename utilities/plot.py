@@ -3,6 +3,12 @@ import numpy as np
 from sklearn import tree
 from sklearn.tree import export_text
 import seaborn
+import warnings
+
+# Suppress all UserWarnings
+warnings.filterwarnings("ignore", category=UserWarning)
+
+
 seaborn.set(style = 'whitegrid')
 
 def _get_nodes_and_choics(tree_as_text,n_cl,X_header):
@@ -61,8 +67,7 @@ def _get_nodes_and_choics(tree_as_text,n_cl,X_header):
 
     return nodes, choices, depth, splits
 
-def plot_tree(interpretation_tree,categories,X_header,df_normalized_with_cluster, \
-              colors,size=(10,10),fs_choices=6,fs_categories=6):
+def plot_tree(interpretation_tree,categories,X_header,df_normalized_with_cluster, colors, size=(10,10), fs_choices=6, fs_categories=6):
     #df_normalized_with_cluster["cluster_tree"] = interpretation_tree.predict(df_normalized_with_cluster[categories])
     n_cl = df_normalized_with_cluster["cluster_final"].max() + 1
     
@@ -90,7 +95,7 @@ def plot_tree(interpretation_tree,categories,X_header,df_normalized_with_cluster
                     splits_list += [[]]
 
     
-    fig = plt.figure(figsize = size)
+    fig = plt.figure(figsize = size, dpi=300)
 
     j=1
     for i in range(len(midlepoints_y)-1):
@@ -195,7 +200,7 @@ def plot_tree(interpretation_tree,categories,X_header,df_normalized_with_cluster
         ax.set_xticks(angles)
         ax.set_rmax(1.02)
         ax.set_rmin(-0.2)
-        ax.set_yticklabels([0,"","","","",1],fontdict={"fontsize":8})
+        ax.set_yticklabels([0,"","","","",1], fontdict={"fontsize":8})
         ax.set_yticks([0,0.2,0.4,0.6,0.8,1])
 #        plt.show()
         
