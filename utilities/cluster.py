@@ -7,15 +7,43 @@ import matplotlib.pyplot as plt
 import copy
 
 def calc_inertia(X,ai,labels):
+    """
+    Calculate the inertia of a clustering model.
+
+    Parameters:
+    X (numpy.ndarray): The input data matrix.
+    ai (sklearn.cluster.KMeans): The trained clustering model.
+    labels (numpy.ndarray): The predicted labels for each data point.
+
+    Returns:
+    float: The inertia value.
+
+    """
     inertia = 0
     for i in range(len(labels)):
-        inertia_i = sum((X[i,j] - ai.cluster_centers_[labels[i]][j])**2 \
-                        for j in range(X.shape[1]) )   
+        # Calculate the squared Euclidean distance between each data point and its cluster center
+        inertia_i = sum((X[i,j] - ai.cluster_centers_[labels[i]][j])**2 for j in range(X.shape[1]) )   
+        # Sum up the inertia for all data points
         inertia += inertia_i
 
+    # Return the total inertia value
     return inertia
 
+
 def cluster(df_input, short_names,n_cl,figure_folder):
+    """
+    Clusters the input data using KMeans algorithm and returns a DataFrame with the initial cluster labels.
+
+    Parameters:
+    df_input (DataFrame): The input data to be clustered.
+    short_names (list): A list of short names for the features in the input data.
+    n_cl (int): The number of clusters to create.
+    figure_folder (str): The folder path to save the generated plot.
+
+    Returns:
+    DataFrame: A copy of the input data DataFrame with an additional column for the initial cluster labels.
+    """
+        
     input_numpy = df_input.to_numpy()
 
     my_inertia = []
@@ -31,7 +59,7 @@ def cluster(df_input, short_names,n_cl,figure_folder):
     for i in range(2,n_test):
         #print(i)
         #ai = KMedoids(n_clusters=i)
-        ai = KMeans(n_clusters=i)
+        ai = KMeans(n_clusters=i, random_state=0, n_init=15)
 
         ai.fit(input_numpy)
         # wccs.append(ai.inertia_)
@@ -64,7 +92,7 @@ def cluster(df_input, short_names,n_cl,figure_folder):
     plt.savefig(figure_folder+"/elbow.svg")
     plt.savefig(figure_folder+"/elbow.pdf")
 
-    ai = KMeans(n_clusters=n_cl)
+    ai = KMeans(n_clusters=n_cl, random_state=0, n_init=15)
     ai.fit(input_numpy)
     df_input_with_cluster = copy.deepcopy(df_input)
     df_input_with_cluster["initial cluster"] = [0]*input_numpy.shape[0]
