@@ -1,0 +1,8 @@
+*.pdf
+*.svg
+biomass_results/
+european_case_study/figures/
+european_case_study/results/
+global_case_study/figures/
+global_case_study/results/
+__pycache__/
