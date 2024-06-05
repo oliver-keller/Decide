@@ -9,7 +9,7 @@ import copy
 from utilities.plot import plot_tree, plot_and_save_spyder_plots
 
 #%%
-def train_tree_and_reorder(df_input_with_cluster,short_names,figure_folder,colors,plot_all_spyders,tree_size=(15,10)):
+def train_tree_and_reorder(df_input_with_cluster,short_names,figure_folder,colors,plot_all_spyders,tree_size=(15,10), absolute_values=False):
     """
     Trains a decision tree classifier using the input data and returns the reordered dataframe, nodes, and choices.
     Reordering means that the cluster labels are reordered based on the decision tree classifier.
@@ -38,7 +38,7 @@ def train_tree_and_reorder(df_input_with_cluster,short_names,figure_folder,color
     score = []
 
     for n_leafs in n_leafnodes:
-        interpretation_tree = tree.DecisionTreeClassifier(max_leaf_nodes=n_leafs,criterion="entropy")
+        interpretation_tree = tree.DecisionTreeClassifier(max_leaf_nodes=n_leafs,criterion="entropy", random_state=0)
         interpretation_tree.fit(df_input_with_cluster[categories],target_tree)
         score.append(interpretation_tree.score(df_input_with_cluster[categories],target_tree))
 
@@ -49,7 +49,7 @@ def train_tree_and_reorder(df_input_with_cluster,short_names,figure_folder,color
     plt.ylabel("score")
 
 
-    interpretation_tree = tree.DecisionTreeClassifier(max_leaf_nodes=n_cl,criterion="entropy")
+    interpretation_tree = tree.DecisionTreeClassifier(max_leaf_nodes=n_cl,criterion="entropy", random_state=0)
     interpretation_tree.fit(df_input_with_cluster[categories],target_tree)
     plt.figure()
     tree.plot_tree(interpretation_tree,feature_names=short_names,fontsize=8)
@@ -63,12 +63,12 @@ def train_tree_and_reorder(df_input_with_cluster,short_names,figure_folder,color
 
     df_input_with_cluster["cluster_final"] = interpretation_tree.predict(df_input_with_cluster[categories])
 
-    nodes, choices = plot_tree(interpretation_tree,categories,short_names,df_input_with_cluster,colors,size=tree_size)
+    nodes, choices = plot_tree(interpretation_tree,categories,short_names,df_input_with_cluster,colors,size=tree_size, absolute_values=absolute_values)
     plt.savefig(figure_folder+"/nice_tree.svg")
     plt.savefig(figure_folder+"/nice_tree.pdf")
 
     if plot_all_spyders:
-        plot_and_save_spyder_plots(interpretation_tree,categories, df_input_with_cluster,short_names,figure_folder,colors)
+        plot_and_save_spyder_plots(interpretation_tree,categories, df_input_with_cluster,short_names,figure_folder,colors, absolute_values=absolute_values)
     
 
 

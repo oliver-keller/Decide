@@ -59,7 +59,7 @@ def cluster(df_input, short_names,n_cl,figure_folder):
     for i in range(2,n_test):
         #print(i)
         #ai = KMedoids(n_clusters=i)
-        ai = KMeans(n_clusters=i, random_state=0, n_init=15)
+        ai = KMeans(n_clusters=i, random_state=0, n_init=10)
 
         ai.fit(input_numpy)
         # wccs.append(ai.inertia_)
@@ -92,7 +92,7 @@ def cluster(df_input, short_names,n_cl,figure_folder):
     plt.savefig(figure_folder+"/elbow.svg")
     plt.savefig(figure_folder+"/elbow.pdf")
 
-    ai = KMeans(n_clusters=n_cl, random_state=0, n_init=15)
+    ai = KMeans(n_clusters=n_cl, random_state=0, n_init=10)
     ai.fit(input_numpy)
     df_input_with_cluster = copy.deepcopy(df_input)
     df_input_with_cluster["initial cluster"] = [0]*input_numpy.shape[0]

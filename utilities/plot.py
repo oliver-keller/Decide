@@ -67,9 +67,8 @@ def _get_nodes_and_choics(tree_as_text,n_cl,X_header):
 
     return nodes, choices, depth, splits
 
-def plot_tree(interpretation_tree,categories,X_header,df_normalized_with_cluster, colors, size=(10,10), fs_choices=6, fs_categories=6):
-    #df_normalized_with_cluster["cluster_tree"] = interpretation_tree.predict(df_normalized_with_cluster[categories])
-    n_cl = df_normalized_with_cluster["cluster_final"].max() + 1
+def plot_tree(interpretation_tree,categories,X_header,df_with_cluster, colors, size=(10,10), fs_choices=6, fs_categories=6, absolute_values=False):
+    n_cl = df_with_cluster["cluster_final"].max() + 1
     
     tree_as_text = export_text(interpretation_tree,feature_names=X_header)
     
@@ -144,7 +143,9 @@ def plot_tree(interpretation_tree,categories,X_header,df_normalized_with_cluster
     max_metrics = [0]*n_metrics
     for i in range(n_metrics):
         metric = categories[i]
-        max_metrics[i] = df_normalized_with_cluster[metric].max()
+        max_metrics[i] = df_with_cluster[metric].max()
+
+    
 
 
     for i_clusters in range(len(clusters_for_polar_list)): 
@@ -156,12 +157,12 @@ def plot_tree(interpretation_tree,categories,X_header,df_normalized_with_cluster
         max_list = [0]*n_metrics
 
 
-        df_plot_clusters = df_normalized_with_cluster.loc[df_normalized_with_cluster["cluster_final"].isin(clusters_for_polar)]
+        df_plot_clusters = df_with_cluster.loc[df_with_cluster["cluster_final"].isin(clusters_for_polar)]
 
         for i in range(n_metrics):
             metric = categories[i]
-            max_list[i] = df_plot_clusters[metric].max()/max_metrics[i]
-            min_list[i] = df_plot_clusters[metric].min()/max_metrics[i]
+            max_list[i] = df_plot_clusters[metric].max() if absolute_values else df_plot_clusters[metric].max()/max_metrics[i]
+            min_list[i] = df_plot_clusters[metric].min() if absolute_values else df_plot_clusters[metric].min()/max_metrics[i]
 
 
         angles = np.linspace(0, 2 * np.pi, n_metrics, endpoint=False)
@@ -181,13 +182,15 @@ def plot_tree(interpretation_tree,categories,X_header,df_normalized_with_cluster
         if len(split) > 0:
             i_metric = split[0]
             if split[2] == "low":
-                plt.polar([angles[i_metric], angles[i_metric]], [split[1]/max_metrics[i_metric], min_list[i_metric]], \
-                            linewidth=3,color=colors[i_metric])
+                if absolute_values:
+                    plt.polar([angles[i_metric], angles[i_metric]], [split[1], min_list[i_metric]], linewidth=3,color=colors[i_metric])
+                else:
+                    plt.polar([angles[i_metric], angles[i_metric]], [split[1]/max_metrics[i_metric], min_list[i_metric]], linewidth=3,color=colors[i_metric])
             else:
-                #print(i_metric)
-                #print(max_metrics)
-                plt.polar([angles[i_metric], angles[i_metric]], [split[1]/max_metrics[i_metric], max_list[i_metric]],  \
-                        linewidth=3,color=colors[i_metric])
+                if absolute_values:
+                    plt.polar([angles[i_metric], angles[i_metric]], [split[1], max_list[i_metric]], linewidth=3,color=colors[i_metric])
+                else:
+                    plt.polar([angles[i_metric], angles[i_metric]], [split[1]/max_metrics[i_metric], max_list[i_metric]], linewidth=3,color=colors[i_metric])
             delta = (10/360)*2 * np.pi *(0.374/split[1])
             plt.polar([angles[i_metric]-delta, angles[i_metric]+delta], [split[1]/max_metrics[i_metric], split[1]/max_metrics[i_metric]],  \
                         linewidth=3,color=colors[i_metric])
@@ -196,25 +199,28 @@ def plot_tree(interpretation_tree,categories,X_header,df_normalized_with_cluster
         angles_fine = np.linspace(0, 2 * np.pi, n_fine, endpoint=False)
         angles_fine=np.concatenate((angles_fine, [angles_fine[0]]))
         plt.plot(angles_fine,[0]*len(angles_fine),color="k",linewidth=1)
-        plt.plot(angles_fine,[1]*len(angles_fine),color="k",linewidth=1)
+        plt.plot(angles_fine,[max(max_metrics)]*len(angles_fine),color="k",linewidth=1) if absolute_values else plt.plot(angles_fine,[1]*len(angles_fine),color="k",linewidth=1)
         ax.set_xticks(angles)
-        ax.set_rmax(1.02)
-        ax.set_rmin(-0.2)
-        ax.set_yticklabels([0,"","","","",1], fontdict={"fontsize":8})
-        ax.set_yticks([0,0.2,0.4,0.6,0.8,1])
+        if absolute_values:
+            ax.set_rmax(max(max_metrics)*1.02)
+            ax.set_rmin(-max(max_metrics)*1/5)
+            ax.set_yticklabels([0," "," "," "," ", f"{round(max(max_metrics), 1)} TWh/a"], fontdict={"fontsize":8})
+            ax.set_yticks([0,max(max_metrics)*1/5, max(max_metrics)*2/5, max(max_metrics)*3/5, max(max_metrics)*4/5, max(max_metrics)])
+            
+        else:
+            ax.set_rmax(1.02)
+            ax.set_rmin(-0.2)
+            ax.set_yticklabels([0,"","","","",1], fontdict={"fontsize":8})
+            ax.set_yticks([0,0.2,0.4,0.6,0.8,1])
 #        plt.show()
         
         plt.tight_layout()
 
     return nodes, choices
 
-def plot_and_save_spyder_plots(interpretation_tree,categories, \
-                               df_normalized_with_cluster,X_header,figure_folder,colors):
-    
-
-
+def plot_and_save_spyder_plots(interpretation_tree,categories, df_with_cluster, X_header, figure_folder, colors, absolute_values=False):
     tree_as_text = export_text(interpretation_tree,feature_names=X_header)
-    n_cl = df_normalized_with_cluster["cluster_final"].max() + 1
+    n_cl = df_with_cluster["cluster_final"].max() + 1
     nodes, choices, depth, splits = _get_nodes_and_choics(tree_as_text,n_cl,X_header)
 
 
@@ -229,7 +235,7 @@ def plot_and_save_spyder_plots(interpretation_tree,categories, \
                 min_list = [0]*n_metrics
                 max_list = [0]*n_metrics
 
-                df_plot_clusters = df_normalized_with_cluster.loc[df_normalized_with_cluster["cluster_final"].isin(clusters_for_polar)]
+                df_plot_clusters = df_with_cluster.loc[df_with_cluster["cluster_final"].isin(clusters_for_polar)]
 
                 for i in range(n_metrics):
                     metric = categories[i]
@@ -238,10 +244,7 @@ def plot_and_save_spyder_plots(interpretation_tree,categories, \
                 angles = np.linspace(0, 2 * np.pi, n_metrics, endpoint=False)
                 delta = (10/360)*2 * np.pi
 
-                # print(clusters_for_polar)
-                # print(max_list)
-
-                # The first value is repeated to close the chart.
+                # The first value is repeated to close the chart
                 angles=np.concatenate((angles, [angles[0]]))
 
                 fig, ax = plt.subplots(figsize=(2,2),subplot_kw={'projection': 'polar'})
@@ -250,37 +253,43 @@ def plot_and_save_spyder_plots(interpretation_tree,categories, \
                 for i_metric in range(len(min_list)):
                     plt.plot([angles[i_metric], angles[i_metric]],[min_list[i_metric], max_list[i_metric]],color="b")
 
+                # get äthe absolute maximum value
+                max_absolute_value = max(df_with_cluster.max())
+                
                 # Representation of the spider graph
                 plt.thetagrids(angles[:-1] * 180 / np.pi,[""]*n_metrics)
-#                plt.show()
-                
-                #plt.title("".join([str(c) for c in clusters_for_polar ]) )
 
                 if nodes_key > 0:
                     split = splits[nodes_key][idx]
                     i_metric = split[0]
                     if split[2] == "low":
-                        plt.polar([angles[i_metric], angles[i_metric]], [split[1], min_list[i_metric]], \
-                                    linewidth=3,color=colors[i_metric])
+                        plt.polar([angles[i_metric], angles[i_metric]], [split[1], min_list[i_metric]], linewidth=3,color=colors[i_metric])
                     else:
-                        plt.polar([angles[i_metric], angles[i_metric]], [split[1], max_list[i_metric]],  \
-                                linewidth=3,color=colors[i_metric])
+                        plt.polar([angles[i_metric], angles[i_metric]], [split[1], max_list[i_metric]], linewidth=3,color=colors[i_metric])
                     delta = (10/360)*2 * np.pi *(0.374/split[1])
                     plt.polar([angles[i_metric]-delta, angles[i_metric]+delta], [split[1], split[1]],  \
                                 linewidth=3,color=colors[i_metric])
+           
 
                 n_fine = 100
                 angles_fine = np.linspace(0, 2 * np.pi, n_fine, endpoint=False)
                 angles_fine=np.concatenate((angles_fine, [angles_fine[0]]))
                 plt.plot(angles_fine,[0]*len(angles_fine),color="k",linewidth=1)
-                plt.plot(angles_fine,[1]*len(angles_fine),color="k",linewidth=1)
-                ax.set_rmax(1.02)
-                ax.set_rmin(-0.2)
-                
+                if absolute_values:
+                    plt.plot(angles_fine,[max_absolute_value]*len(angles_fine),color="k",linewidth=1)
+                    ax.set_rmax(max_absolute_value*1.02)
+                    ax.set_rmin(-max_absolute_value*1/5)
+                    ax.set_yticklabels([0," "," "," "," ", f"{round(max_absolute_value, 1)} TWh/a"], fontdict={"fontsize":8})
+                    ax.set_yticks([0,max_absolute_value*1/5, max_absolute_value*2/5, max_absolute_value*3/5, max_absolute_value*4/5, max_absolute_value])
+
+                else:
+                    plt.plot(angles_fine,[1]*len(angles_fine),color="k",linewidth=1)
+                    ax.set_rmax(1.02)
+                    ax.set_rmin(-0.2)                   
+                    ax.set_yticklabels([0,"","","","",1],fontdict={"fontsize":8})
+                    ax.set_yticks([0,0.2,0.4,0.6,0.8,1])
+
                 plt.tight_layout()
-                
-                ax.set_yticklabels([0,"","","","",1],fontdict={"fontsize":8})
-                ax.set_yticks([0,0.2,0.4,0.6,0.8,1])
-                #plt.show()
+
                 plt.savefig(figure_folder+"/"+"".join([str(c) for c in clusters_for_polar ]) + ".svg",  format="svg")
                 plt.savefig(figure_folder + "/" + "".join([str(c) for c in clusters_for_polar]) + ".pdf")
