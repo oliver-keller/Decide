@@ -6,3 +6,5 @@ european_case_study/results/
 global_case_study/figures/
 global_case_study/results/
 __pycache__/
+usage_files/
+*.csv
