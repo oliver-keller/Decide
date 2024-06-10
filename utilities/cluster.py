@@ -30,7 +30,7 @@ def calc_inertia(X,ai,labels):
     return inertia
 
 
-def cluster(df_input, short_names,n_cl,figure_folder):
+def cluster(df_input, short_names,n_cl,figure_folder, print_info=True):
     """
     Clusters the input data using KMeans algorithm and returns a DataFrame with the initial cluster labels.
 
@@ -51,46 +51,45 @@ def cluster(df_input, short_names,n_cl,figure_folder):
     my_inertia_tree = []
     n_test = 25
 
-    print("\t", end="")
-    for x in short_names:
-        print(x + "\t", end="")
-    print()
+    if print_info:
+        print("\t", end="")
+        for x in short_names:
+            print(x + "\t", end="")
+        print()
 
-    for i in range(2,n_test):
-        #print(i)
-        #ai = KMedoids(n_clusters=i)
-        ai = KMeans(n_clusters=i, random_state=0, n_init=10)
+        for i in range(2,n_test):
+            ai = KMeans(n_clusters=i, random_state=0, n_init=10)
 
-        ai.fit(input_numpy)
-        # wccs.append(ai.inertia_)
+            ai.fit(input_numpy)
 
-        my_inertia.append(calc_inertia(input_numpy,ai,labels=ai.labels_))
+            my_inertia.append(calc_inertia(input_numpy,ai,labels=ai.labels_))
 
-        target_tree = pd.DataFrame(data=ai.labels_)
-        interpretation_tree = tree.DecisionTreeClassifier(max_leaf_nodes=i,criterion="entropy")
-        interpretation_tree.fit(df_input,target_tree)
-        score.append(interpretation_tree.score(df_input,target_tree))
-        labels_tree = interpretation_tree.predict(df_input)
-        my_inertia_tree.append(calc_inertia(input_numpy,ai,labels=labels_tree ))    
+            target_tree = pd.DataFrame(data=ai.labels_)
+            interpretation_tree = tree.DecisionTreeClassifier(max_leaf_nodes=i,criterion="entropy")
+            interpretation_tree.fit(df_input,target_tree)
+            score.append(interpretation_tree.score(df_input,target_tree))
+            labels_tree = interpretation_tree.predict(df_input)
+            my_inertia_tree.append(calc_inertia(input_numpy,ai,labels=labels_tree ))    
 
 
-        tree_as_text = export_text(interpretation_tree,feature_names=short_names)
-        print(str(i)+ "& \t", end="")
-        for cat in short_names:
-            print(str(int(tree_as_text.count(cat)/2))+ "& \t", end="")
-        print("\\")
+            tree_as_text = export_text(interpretation_tree,feature_names=short_names)
+    
+            print(str(i)+ "& \t", end="")
+            for cat in short_names:
+                print(str(int(tree_as_text.count(cat)/2))+ "& \t", end="")
+            print("\\")
 
 
-    plt.figure()
-    # plt.plot(range(2,n_test),wccs)
-    plt.plot(range(2,n_test),my_inertia,label="KMeans")
-    plt.plot(range(2,n_test),my_inertia_tree,label="Re-ordered")
-    plt.legend()
-    plt.plot([n_cl,n_cl],[0,my_inertia_tree[0]],color="k")
-    plt.xlabel("Number of clusters")
-    plt.ylabel("Distance measure $d$")
-    plt.savefig(figure_folder+"/elbow.svg")
-    plt.savefig(figure_folder+"/elbow.pdf")
+        plt.figure()
+        # plt.plot(range(2,n_test),wccs)
+        plt.plot(range(2,n_test),my_inertia,label="KMeans")
+        plt.plot(range(2,n_test),my_inertia_tree,label="Re-ordered")
+        plt.legend()
+        plt.plot([n_cl,n_cl],[0,my_inertia_tree[0]],color="k")
+        plt.xlabel("Number of clusters")
+        plt.ylabel("Distance measure $d$")
+        plt.savefig(figure_folder+"/elbow.svg")
+        plt.savefig(figure_folder+"/elbow.pdf")
 
     ai = KMeans(n_clusters=n_cl, random_state=0, n_init=10)
     ai.fit(input_numpy)

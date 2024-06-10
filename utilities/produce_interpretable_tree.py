@@ -8,17 +8,17 @@ from numpy.linalg import eig
 
 default_colors = ["b","c","k","g","m","r","y","tab:blue","tab:brown", "tab:orange", "tab:pink","tab:gree","tab:gray"]
 
-def produce_interpretable_tree(df_input, short_names, n_cl, figure_folder=None, tree_size=(15,10), colors=default_colors,plot_all_spyders = True, absolute_values=False):
+def produce_interpretable_tree(df_input, short_names, n_cl, figure_folder=None, tree_size=(15,10), colors=default_colors,plot_all_spyders = True, absolute_values=False, print_info=True):
 
     if figure_folder is None:
         figure_folder = "figures"
         if not os.path.exists(figure_folder):
             os.makedirs(figure_folder)
 
-    df_input_with_initial_cluster = cluster(df_input, short_names, n_cl, figure_folder)
+    df_input_with_initial_cluster = cluster(df_input, short_names, n_cl, figure_folder, print_info=print_info)
     # print(df_input_with_initial_cluster)
 
-    df_input_with_final_cluster, nodes, choices = train_tree_and_reorder(df_input_with_initial_cluster, short_names, figure_folder, tree_size=tree_size, colors=colors, plot_all_spyders=plot_all_spyders, absolute_values=absolute_values)
+    df_input_with_final_cluster, nodes, choices = train_tree_and_reorder(df_input_with_initial_cluster, short_names, figure_folder, tree_size=tree_size, colors=colors, plot_all_spyders=plot_all_spyders, absolute_values=absolute_values, print_info=print_info)
     # print(df_input_with_final_cluster)
     
     categories = df_input_with_final_cluster.columns.to_list() 

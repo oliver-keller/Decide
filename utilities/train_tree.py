@@ -9,7 +9,7 @@ import copy
 from utilities.plot import plot_tree, plot_and_save_spyder_plots
 
 #%%
-def train_tree_and_reorder(df_input_with_cluster,short_names,figure_folder,colors,plot_all_spyders,tree_size=(15,10), absolute_values=False):
+def train_tree_and_reorder(df_input_with_cluster,short_names,figure_folder,colors,plot_all_spyders,tree_size=(15,10), absolute_values=False, print_info=True):
     """
     Trains a decision tree classifier using the input data and returns the reordered dataframe, nodes, and choices.
     Reordering means that the cluster labels are reordered based on the decision tree classifier.
@@ -31,29 +31,28 @@ def train_tree_and_reorder(df_input_with_cluster,short_names,figure_folder,color
     categories.remove("initial cluster")
     n_metrics = len(categories)
 
-
     target_tree = df_input_with_cluster["initial cluster"]
 
-    n_leafnodes = list(range(3,20))
-    score = []
+    if print_info:
+        n_leafnodes = list(range(3,20))
+        score = []
 
-    for n_leafs in n_leafnodes:
-        interpretation_tree = tree.DecisionTreeClassifier(max_leaf_nodes=n_leafs,criterion="entropy", random_state=0)
-        interpretation_tree.fit(df_input_with_cluster[categories],target_tree)
-        score.append(interpretation_tree.score(df_input_with_cluster[categories],target_tree))
+        for n_leafs in n_leafnodes:
+            interpretation_tree = tree.DecisionTreeClassifier(max_leaf_nodes=n_leafs,criterion="entropy", random_state=0)
+            interpretation_tree.fit(df_input_with_cluster[categories],target_tree)
+            score.append(interpretation_tree.score(df_input_with_cluster[categories],target_tree))
 
-    plt.figure()
-    plt.plot(n_leafnodes,score)
-    plt.plot([n_cl,n_cl],[0.92,1],"--",color="k")
-    plt.xlabel("number of tree leaves")
-    plt.ylabel("score")
+        plt.figure()
+        plt.plot(n_leafnodes,score)
+        plt.plot([n_cl,n_cl],[0.92,1],"--",color="k")
+        plt.xlabel("number of tree leaves")
+        plt.ylabel("score")
 
 
     interpretation_tree = tree.DecisionTreeClassifier(max_leaf_nodes=n_cl,criterion="entropy", random_state=0)
     interpretation_tree.fit(df_input_with_cluster[categories],target_tree)
     plt.figure()
     tree.plot_tree(interpretation_tree,feature_names=short_names,fontsize=8)
-    #plt.show()
     plt.tight_layout()
 
 
