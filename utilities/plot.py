@@ -181,19 +181,21 @@ def plot_tree(interpretation_tree,categories,X_header,df_with_cluster, colors, s
         
         if len(split) > 0:
             i_metric = split[0]
-            if split[2] == "low":
-                if absolute_values:
+            delta = (10/360)*2 * np.pi
+            if absolute_values:
+                if split[2] == "low":
                     plt.polar([angles[i_metric], angles[i_metric]], [split[1], min_list[i_metric]], linewidth=3,color=colors[i_metric])
                 else:
-                    plt.polar([angles[i_metric], angles[i_metric]], [split[1]/max_metrics[i_metric], min_list[i_metric]], linewidth=3,color=colors[i_metric])
-            else:
-                if absolute_values:
                     plt.polar([angles[i_metric], angles[i_metric]], [split[1], max_list[i_metric]], linewidth=3,color=colors[i_metric])
+                plt.polar([angles[i_metric]-delta, angles[i_metric]+delta], [split[1], split[1]], linewidth=3,color=colors[i_metric])
+
+            else: # absolute_values == False
+                if split[2] == "low":
+                    plt.polar([angles[i_metric], angles[i_metric]], [split[1]/max_metrics[i_metric], min_list[i_metric]], linewidth=3,color=colors[i_metric])
                 else:
                     plt.polar([angles[i_metric], angles[i_metric]], [split[1]/max_metrics[i_metric], max_list[i_metric]], linewidth=3,color=colors[i_metric])
-            delta = (10/360)*2 * np.pi *(0.374/split[1])
-            plt.polar([angles[i_metric]-delta, angles[i_metric]+delta], [split[1]/max_metrics[i_metric], split[1]/max_metrics[i_metric]],  \
-                        linewidth=3,color=colors[i_metric])
+                plt.polar([angles[i_metric]-delta, angles[i_metric]+delta], [split[1]/max_metrics[i_metric], split[1]/max_metrics[i_metric]], linewidth=3,color=colors[i_metric])
+
 
         n_fine = 100
         angles_fine = np.linspace(0, 2 * np.pi, n_fine, endpoint=False)
@@ -204,7 +206,7 @@ def plot_tree(interpretation_tree,categories,X_header,df_with_cluster, colors, s
         if absolute_values:
             ax.set_rmax(max(max_metrics)*1.02)
             ax.set_rmin(-max(max_metrics)*1/5)
-            ax.set_yticklabels([0," "," "," "," ", f"{round(max(max_metrics), 1)} TWh/a"], fontdict={"fontsize":8})
+            ax.set_yticklabels([0," "," "," "," ", f"{max(max_metrics):.0f} TWh/a"], fontdict={"fontsize":8})
             ax.set_yticks([0,max(max_metrics)*1/5, max(max_metrics)*2/5, max(max_metrics)*3/5, max(max_metrics)*4/5, max(max_metrics)])
             
         else:
