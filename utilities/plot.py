@@ -12,6 +12,21 @@ warnings.filterwarnings("ignore", category=UserWarning)
 seaborn.set(style = 'whitegrid')
 
 def _get_nodes_and_choics(tree_as_text,n_cl,X_header):
+    """
+    Extracts nodes, choices, depth, and splits from a tree represented as text.
+
+    Args:
+        tree_as_text (str): The tree represented as text.
+        n_cl (int): The number of clusters.
+        X_header (list):  The list of short names for the input data columns.
+
+    Returns:
+        tuple: A tuple containing the following elements:
+            - nodes (dict): A dictionary containing the nodes of the tree.
+            - choices (dict): A dictionary containing the choices of the tree.
+            - depth (int): The depth of the tree.
+            - splits (dict): A dictionary containing the splits of the tree.
+    """    
     node_list = tree_as_text.split("\n")[:-1]
     depth = max([node_list[i].count("|")  for i in range(len(node_list))])
     nodes = {}
@@ -67,7 +82,25 @@ def _get_nodes_and_choics(tree_as_text,n_cl,X_header):
 
     return nodes, choices, depth, splits
 
-def plot_tree(interpretation_tree,categories,X_header,df_with_cluster, colors, size=(10,10), fs_choices=6, fs_categories=6, absolute_values=False):
+def plot_tree(interpretation_tree, categories, X_header, df_with_cluster, colors, size=(10,10), fs_choices=6, fs_categories=6, absolute_values=False):
+    """
+    Plot a tree visualization.
+
+    Parameters:
+    interpretation_tree (object): The interpretation tree object.
+    categories (list): List of metric categories.
+    X_header (list): List of feature names.
+    df_with_cluster (DataFrame): DataFrame with cluster information.
+    colors (list): List of colors for each metric category.
+    size (tuple, optional): Figure size in inches. Defaults to (10, 10).
+    fs_choices (int, optional): Font size for choices. Defaults to 6.
+    fs_categories (int, optional): Font size for categories. Defaults to 6.
+    absolute_values (bool, optional): Flag to indicate whether to use absolute values for metrics. Defaults to False.
+
+    Returns:
+    tuple: A tuple containing the nodes and choices of the interpretation tree.
+    """
+
     n_cl = df_with_cluster["cluster_final"].max() + 1
     
     tree_as_text = export_text(interpretation_tree,feature_names=X_header)
@@ -221,6 +254,21 @@ def plot_tree(interpretation_tree,categories,X_header,df_with_cluster, colors, s
     return nodes, choices
 
 def plot_and_save_spyder_plots(interpretation_tree,categories, df_with_cluster, X_header, figure_folder, colors, absolute_values=False):
+    """
+    Plot and save spider plots for each cluster.
+
+    Parameters:
+        interpretation_tree (object): The interpretation tree object.
+        categories (list): List of metric categories.
+        df_with_cluster (DataFrame): DataFrame with cluster information.
+        X_header (list): List of feature names.
+        figure_folder (str): The folder path to save the generated figures.
+        colors (list): List of colors for plotting.
+        absolute_values (bool, optional): Flag to indicate whether to use absolute values for metrics. Defaults to False.
+
+    Returns:
+        None
+    """
     tree_as_text = export_text(interpretation_tree,feature_names=X_header)
     n_cl = df_with_cluster["cluster_final"].max() + 1
     nodes, choices, depth, splits = _get_nodes_and_choics(tree_as_text,n_cl,X_header)

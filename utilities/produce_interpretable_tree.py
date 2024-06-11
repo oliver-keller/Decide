@@ -9,7 +9,23 @@ from numpy.linalg import eig
 default_colors = ["b","c","k","g","m","r","y","tab:blue","tab:brown", "tab:orange", "tab:pink","tab:gree","tab:gray"]
 
 def produce_interpretable_tree(df_input, short_names, n_cl, figure_folder=None, tree_size=(15,10), colors=default_colors,plot_all_spyders = True, absolute_values=False, print_info=True):
+    """
+    Produces an interpretable tree based on the input data.
 
+    Args:
+        df_input (DataFrame): The input data frame.
+        short_names (list): The list of short names for the input data columns.
+        n_cl (int): The number of clusters.
+        figure_folder (str, optional): The folder to save the figures. Defaults to None.
+        tree_size (tuple, optional): The size of the tree figure. Defaults to (15, 10).
+        colors (dict, optional): The colors for plotting. Defaults to default_colors.
+        plot_all_spyders (bool, optional): Whether to plot all spyders. Defaults to True.
+        absolute_values (bool, optional): Whether to use absolute values. Defaults to False.
+        print_info (bool, optional): Whether to print information. Defaults to True.
+
+    Returns:
+        tuple: A tuple containing the final cluster data frame, nodes, choices, and decision space.
+    """    
     if figure_folder is None:
         figure_folder = "figures"
         if not os.path.exists(figure_folder):

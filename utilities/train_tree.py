@@ -21,6 +21,8 @@ def train_tree_and_reorder(df_input_with_cluster,short_names,figure_folder,color
         colors (list): The list of colors for plotting.
         plot_all_spyders (bool): Flag indicating whether to plot all spyder plots.
         tree_size (tuple, optional): The size of the decision tree plot. Defaults to (15, 10).
+        absolute_values (bool, optional): Flag indicating whether to use absolute values for plotting. Defaults to False.
+        print_info (bool, optional): Flag indicating whether to print additional information. Defaults to True.
 
     Returns:
         tuple: A tuple containing the reordered dataframe, nodes, and choices.
