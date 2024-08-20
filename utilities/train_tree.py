@@ -58,15 +58,16 @@ def train_tree_and_reorder(df_input_with_cluster,short_names,figure_folder,color
     plt.tight_layout()
 
 
-
-    plt.savefig(figure_folder+"/tree.svg")
-    plt.savefig(figure_folder+"/tree.pdf")
+    # option to save the tree as a svg or pdf
+    # plt.savefig(figure_folder+"/tree.svg")
+    # plt.savefig(figure_folder+"/tree.pdf")
 
     df_input_with_cluster["cluster_final"] = interpretation_tree.predict(df_input_with_cluster[categories])
 
     nodes, choices = plot_tree(interpretation_tree,categories,short_names,df_input_with_cluster,colors,size=tree_size, absolute_values=absolute_values)
-    plt.savefig(figure_folder+"/nice_tree.svg")
-    plt.savefig(figure_folder+"/nice_tree.pdf")
+    # option to save the tree as a svg or pdf
+    # plt.savefig(figure_folder+"/nice_tree.svg")
+    # plt.savefig(figure_folder+"/nice_tree.pdf")
 
     if plot_all_spyders:
         plot_and_save_spyder_plots(interpretation_tree,categories, df_input_with_cluster,short_names,figure_folder,colors, absolute_values=absolute_values)
