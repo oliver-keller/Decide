@@ -127,7 +127,7 @@ def plot_tree(interpretation_tree, categories, X_header, df_with_cluster, colors
                     splits_list += [[]]
 
     
-    fig = plt.figure(figsize = size, dpi=300)
+    fig = plt.figure(figsize = size, dpi=900)
 
     j=1
     for i in range(len(midlepoints_y)-1):
@@ -239,13 +239,14 @@ def plot_tree(interpretation_tree, categories, X_header, df_with_cluster, colors
         if absolute_values:
             ax.set_rmax(max(max_metrics)*1.02)
             ax.set_rmin(-max(max_metrics)*1/5)
-            ax.set_yticklabels([0," "," "," "," ", f"{max(max_metrics):.0f} TWh/a"], fontdict={"fontsize":8})
-            ax.set_yticks([0,max(max_metrics)*1/5, max(max_metrics)*2/5, max(max_metrics)*3/5, max(max_metrics)*4/5, max(max_metrics)])
+            ax.set_yticks([0,max(max_metrics)*1/5, max(max_metrics)*2/5, max(max_metrics)*3/5, max(max_metrics)*4/5, max(max_metrics)])  
+            ax.set_yticklabels([" "," "," "," "," ", f"{max(max_metrics):.0f} TWh/a"], fontdict={"fontsize":6}, zorder=10000)
+            # ax.set_yticklabels([0," "," "," "," ", f"{max(max_metrics):.0f} TWh/a"], fontdict={"fontsize":8}, zorder=10000)
             
         else:
             ax.set_rmax(1.02)
             ax.set_rmin(-0.2)
-            ax.set_yticklabels([0,"","","","",1], fontdict={"fontsize":8})
+            ax.set_yticklabels([" ","","","","",1], fontdict={"fontsize":8})
             ax.set_yticks([0,0.2,0.4,0.6,0.8,1])
 #        plt.show()
         
@@ -324,13 +325,13 @@ def plot_and_save_spyder_plots(interpretation_tree,categories, df_with_cluster, 
                 n_fine = 100
                 angles_fine = np.linspace(0, 2 * np.pi, n_fine, endpoint=False)
                 angles_fine=np.concatenate((angles_fine, [angles_fine[0]]))
-                plt.plot(angles_fine,[0]*len(angles_fine),color="k",linewidth=1)
+                plt.plot(angles_fine,[0]*len(angles_fine),color="k",linewidth=1, zorder=2)
                 if absolute_values:
                     plt.plot(angles_fine,[max_absolute_value]*len(angles_fine),color="k",linewidth=1)
                     ax.set_rmax(max_absolute_value*1.02)
                     ax.set_rmin(-max_absolute_value*1/5)
-                    ax.set_yticklabels([0," "," "," "," ", f"{round(max_absolute_value, 1)} TWh/a"], fontdict={"fontsize":8})
                     ax.set_yticks([0,max_absolute_value*1/5, max_absolute_value*2/5, max_absolute_value*3/5, max_absolute_value*4/5, max_absolute_value])
+                    ax.set_yticklabels([0," "," "," "," ", f"{round(max_absolute_value, 1)} TWh/a"], fontdict={"fontsize":8}, zorder=10000)
 
                 else:
                     plt.plot(angles_fine,[1]*len(angles_fine),color="k",linewidth=1)
